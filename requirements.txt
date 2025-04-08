@@ -1,0 +1,7 @@
+numpy
+SimpleITK
+pydicom
+flask
+monai
+monai-deploy-app-sdk
+highdicom
