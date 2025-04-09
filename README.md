@@ -1,6 +1,6 @@
 # 🫁 Lung Nodule Detection with MONAI Deploy
 
-This project implements a full pipeline for working with medical images in DICOM format, leveraging **MONAI Deploy** and a pretrained model for lung nodule detection on CT scans.
+This project implements a full pipeline for working with medical images in DICOM format, using **MONAI Deploy** and a pretrained model for lung nodule detection on CT scans.
 
 ---
 
