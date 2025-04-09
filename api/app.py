@@ -1,9 +1,9 @@
 import logging
 from flask import Flask
 from monai.deploy.core import Application
-from api.endpoints.ping_endpoint import ping
-from api.endpoints.upload_endpoint import upload_images
-from api.config import UPLOAD_FOLDER
+from endpoints.ping_endpoint import ping
+from endpoints.upload_endpoint import upload_images
+from config import UPLOAD_FOLDER
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

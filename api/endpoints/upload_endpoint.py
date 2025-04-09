@@ -1,6 +1,6 @@
 import os
 from flask import request, jsonify
-from api.config import UPLOAD_FOLDER
+from config import UPLOAD_FOLDER
 import logging
 
 logger = logging.getLogger(__name__)
