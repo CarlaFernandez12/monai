@@ -1,6 +1,10 @@
 from main_application import MainApplication
 
-if __name__ == "__main__":
 
-    main_app = MainApplication()
-    main_app.run()
+def main():
+    app = MainApplication()
+    app.run()
+
+
+if __name__ == "__main__":
+    main()
