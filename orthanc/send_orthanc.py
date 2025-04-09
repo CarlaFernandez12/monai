@@ -1,27 +1,38 @@
 import os
 from orthanc.orthanc_client import OrthancClient
+from typing import List
 
 DICOM_FOLDER = "/app/data/uploads"
 
+
+def get_dicom_files(folder: str) -> List[str]:
+    return [f for f in os.listdir(folder) if f.endswith(".dcm")]
+
+
+def process_dicom_file(client: OrthancClient, file_path: str):
+    print(f"📤 Subiendo {file_path} a Orthanc...")
+    client.upload_dicom(file_path)
+    os.remove(file_path)
+    print(f"🗑 Eliminado original: {file_path}")
+
+
 class SendToOrthancOperator:
-    def __init__(self):
+    def __init__(self, folder: str = DICOM_FOLDER):
         self.orthanc_client = OrthancClient()
+        self.folder = folder
 
     def compute(self):
         print("🚀 Ejecutando SendToOrthancOperator...")
-        dicom_files = [f for f in os.listdir(DICOM_FOLDER) if f.endswith(".dcm")]
-        
+        dicom_files = get_dicom_files(self.folder)
+
         if not dicom_files:
             print("❌ No hay archivos DICOM en la carpeta.")
             return
 
-        for dicom_file in dicom_files:
-            dicom_path = os.path.join(DICOM_FOLDER, dicom_file)
-            print(f"📤 Subiendo {dicom_path} a Orthanc...")
-            self.orthanc_client.upload_dicom(dicom_path)
-            os.remove(dicom_path)
-            print(f"🗑 Eliminado original: {dicom_path}")
+        for file_name in dicom_files:
+            file_path = os.path.join(self.folder, file_name)
+            process_dicom_file(self.orthanc_client, file_path)
+
 
 if __name__ == "__main__":
-    operator = SendToOrthancOperator()
-    operator.compute()
+    SendToOrthancOperator().compute()
