@@ -14,7 +14,13 @@ def modify_metadata(ds: pydicom.Dataset) -> pydicom.Dataset:
     return ds
 
 def save_modified_dicom(ds: pydicom.Dataset, original_path: str, output_folder: str) -> str:
-    filename = f"mod_{os.path.basename(original_path)}"
+    filename = os.path.basename(original_path)
+    
+    if not filename.startswith("mod_"):
+        filename = f"mod_{filename}"
+    
     output_path = os.path.join(output_folder, filename)
+    
     ds.save_as(output_path)
+    
     return output_path
