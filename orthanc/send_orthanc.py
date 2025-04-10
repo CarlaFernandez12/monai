@@ -1,5 +1,5 @@
 import os
-from orthanc_client import OrthancClient
+from orthanc.orthanc_client import OrthancClient
 from utils.file_utils import list_dicom_files, remove_file
 
 DICOM_FOLDER = "/app/data/uploads"

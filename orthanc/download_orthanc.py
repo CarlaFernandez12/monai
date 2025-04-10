@@ -1,4 +1,4 @@
-from orthanc_client import OrthancClient
+from orthanc.orthanc_client import OrthancClient
 
 class DownloadFromOrthanc:
     def __init__(self): 
