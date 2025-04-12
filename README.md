@@ -83,41 +83,57 @@ Once downloaded, copy the `model.pt` file to the root directory of your project.
 
 ---
 
-## 📝 Run the Full Pipeline
+## 🔄 Full Pipeline Execution
 
-To execute the entire pipeline, follow these steps:
+### Step 1: Run the Application in Docker
 
-### 1. Copy Files to the Docker Container
+Before running the full pipeline, make sure to start the application by running `app.py` inside the `lung_nodule` Docker container. This will allow you to process images through the pipeline.
 
-First, you need to copy the necessary files into the `lung_nodule` Docker container. Use the following command to do this:
-
-```bash
-docker cp /path/to/your/project lung_nodule:/path/in/container
-```
-
-Replace `/path/to/your/project` with the actual path to your project folder and `/path/in/container` with the destination folder in the container.
-
-### 2. Execute the Pipeline Inside the Docker Container
-
-Once the files are copied, you can execute the `pipeline.py` script inside the Docker container to run the entire pipeline. Use the following command:
+In the terminal, run:
 
 ```bash
-docker exec -it lung_nodule python /path/in/container/pipeline.py
+docker exec -it lung_nodule python app.py
 ```
 
-This will execute the pipeline, processing the DICOM images, running inference, and uploading the processed images back to Orthanc.
+### Step 2: Upload Images to Docker
 
----
+To upload images to Docker, use the following `curl.exe` command to send the images to the Docker container:
 
-## 👁 Visualize Processed Images in Orthanc
-
-To view the processed images, open your browser and navigate to the following URL:
-
+```bash
+curl.exe -X POST -F "file=@/path/to/image.dcm" http://localhost:5000/upload
 ```
+
+Replace `/path/to/image.dcm` with the actual path to the DICOM image you want to upload.
+
+### Step 3: Upload Images to Orthanc
+
+Next, execute `orthanc_client.py` inside the `lung_nodule` Docker container to upload the images to Orthanc:
+
+```bash
+docker exec -it lung_nodule python orthanc_client.py
+```
+
+This will ensure that the images are transferred to Orthanc for further processing.
+
+### Step 4: Run the Full Pipeline
+
+Finally, execute the pipeline in Docker to process the images:
+
+```bash
+docker exec -it lung_nodule python pipeline.py
+```
+
+This will complete the full cycle of downloading, processing, and re-uploading the images.
+
+### Step 5: View Processed Images in Orthanc
+
+To visualize the processed images, access Orthanc at:
+
+```bash
 http://orthanc:8042/instances
 ```
 
-This will display all the images stored in Orthanc, including the ones processed by the pipeline.
+You can view all the DICOM images that have been processed and uploaded to Orthanc.
 
 ---
 
