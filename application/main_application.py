@@ -12,3 +12,4 @@ class MainApplication:
     def run(self):
         self.upload_operator.compute(None)
         self.inference_operator.compute(None)
+ 

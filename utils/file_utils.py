@@ -17,3 +17,4 @@ def save_bytes(content: bytes, output_path: str):
 def remove_file(path: str):
     if os.path.exists(path):
         os.remove(path)
+ 

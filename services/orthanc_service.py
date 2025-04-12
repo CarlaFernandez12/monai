@@ -21,3 +21,4 @@ def get_all_instance_ids() -> list:
 def download_instance_file(instance_id: str) -> Optional[bytes]:
     response = requests.get(f"{ORTHANC_URL}/instances/{instance_id}/file", auth=AUTH)
     return response.content if response.status_code == 200 else None
+ 
