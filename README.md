@@ -83,6 +83,60 @@ Once downloaded, copy the `model.pt` file to the root directory of your project.
 
 ---
 
+## 🚀 Build and Start Containers
+
+Before executing the full pipeline, you need to build and start the required Docker containers.
+
+### 1. **Lung Nodule Container**
+
+The **Lung Nodule** container is built from the `Dockerfile` provided in the project.
+
+- Build the container:
+
+```bash
+docker build -t lung_nodule -f Dockerfile .
+```
+
+- Start the container:
+
+```bash
+docker run -d --name lung_nodule lung_nodule
+```
+
+### 2. **Orthanc Container**
+
+The **Orthanc** container is built from the pre-built image `jodogne/orthanc`.
+
+- Pull the Orthanc image:
+
+```bash
+docker pull jodogne/orthanc
+```
+
+- Run the Orthanc container:
+
+```bash
+docker run -d --name orthanc -p 8042:8042 jodogne/orthanc
+```
+
+### 3. **MONAI Deploy Container**
+
+The **MONAI Deploy** container is based on the default MONAI Deploy image.
+
+- Pull the MONAI Deploy image:
+
+```bash
+docker pull monai/monai-deploy
+```
+
+- Run the MONAI Deploy container:
+
+```bash
+docker run -d --name nostalgic_mahavira monai/monai-deploy
+```
+
+---
+
 ## 🔄 Full Pipeline Execution
 
 ### Step 1: Run the Application in Docker
