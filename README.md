@@ -1,4 +1,3 @@
-
 # 🫁 Lung Nodule Detection with MONAI Deploy
 
 This project implements a full pipeline for working with medical images in DICOM format, using **MONAI Deploy** and a pretrained model for lung nodule detection on CT scans.
@@ -11,14 +10,6 @@ To use this repository, you need to set up a Python virtual environment with MON
 
 ### 1. Activate the MONAI Environment
 
-Before running the pipeline, make sure that you have **Python 3.10** or higher installed. You can check your Python version by running the following command:
-
-```bash
-python --version
-```
-
-If you have the correct Python version, proceed with activating the environment.
-
 In your terminal:
 
 ```bash
@@ -30,7 +21,7 @@ Then activate the environment:
 - On **Command Prompt or PowerShell**:
 
 ```bash
-.\your_folder_name\Scriptsctivate
+.\your_folder_name\Scripts\activate
 ```
 
 - On **Git Bash**:
@@ -58,34 +49,53 @@ This project uses the **LUNA16** dataset for lung CT scans. You must download it
 🔗 **Download link**:  
 [https://zenodo.org/records/3723295](https://zenodo.org/records/3723295)
 
-After downloading, you need to convert the `.mhd` files to DICOM format to make them compatible with the MONAI pipeline. To do this, execute the following command:
+After downloading, convert the `.mhd` files to DICOM format by running the following command:
 
 ```bash
 python convert_image.py
 ```
 
-This will run the `convert_image.py` script, which will convert all `.mhd` files in the specified folder to DICOM format.
+🗂️ The converted DICOM files will be saved in the `/dicom` folder.
 
 ---
 
 ## 🧠 Pretrained Model: Lung Nodule Detection
 
-We use the MONAI Model Zoo’s pretrained model for lung nodule detection.
+We use MONAI Model Zoo’s pretrained model for lung nodule detection.
 
-### Download the Pretrained Model
+### Clone the Repository
 
-Instead of cloning a repository, download the pretrained model directly from GitHub. Access the model at the following URL, download `model.pt`, and place it in your project’s directory (e.g., in a folder like `/models`):
+```bash
+git clone https://github.com/Project-MONAI/model-zoo.git
+```
 
-🔗 **Model Download Link**:  
-[https://github.com/Project-MONAI/model-zoo](https://github.com/Project-MONAI/model-zoo)
+### Navigate to the Model Directory
 
-Once downloaded, copy the `model.pt` file to the root directory of your project.
+```bash
+cd model-zoo/models/lung_nodule_ct_detection
+```
+
+### Copy the Pretrained Model to Your Project
+
+```bash
+cp model.pt /path/to/your/project
+```
+
+Make sure `model.pt` is located at the root of your project directory.
 
 ---
 
 ## 🚀 Build and Start Containers
 
 Before executing the full pipeline, you need to build and start the required Docker containers.
+
+### Create Docker Network
+
+First, create a Docker network so all containers can communicate:
+
+```bash
+docker network create lung_net
+```
 
 ### 1. **Lung Nodule Container**
 
@@ -97,10 +107,10 @@ The **Lung Nodule** container is built from the `Dockerfile` provided in the pro
 docker build -t lung_nodule -f Dockerfile .
 ```
 
-- Start the container:
+- Start the container in the created network:
 
 ```bash
-docker run -d --name lung_nodule lung_nodule
+docker run -d --name lung_nodule --network lung_net lung_nodule
 ```
 
 ### 2. **Orthanc Container**
@@ -113,10 +123,10 @@ The **Orthanc** container is built from the pre-built image `jodogne/orthanc`.
 docker pull jodogne/orthanc
 ```
 
-- Run the Orthanc container:
+- Run the Orthanc container in the created network:
 
 ```bash
-docker run -d --name orthanc -p 8042:8042 jodogne/orthanc
+docker run -d --name orthanc --network lung_net -p 8042:8042 jodogne/orthanc
 ```
 
 ### 3. **MONAI Deploy Container**
@@ -129,83 +139,65 @@ The **MONAI Deploy** container is based on the default MONAI Deploy image.
 docker pull monai/monai-deploy
 ```
 
-- Run the MONAI Deploy container:
+- Run the MONAI Deploy container in the created network:
 
 ```bash
-docker run -d --name nostalgic_mahavira monai/monai-deploy
+docker run -d --name monai_deploy --network lung_net monai/monai-deploy
 ```
 
 ---
 
-## 🔄 Full Pipeline Execution
+## 🏃‍♂️ Run Full Pipeline
 
-### Step 1: Run the Application in Docker
+Once the containers are up and running, follow these steps to execute the full pipeline.
 
-Before running the full pipeline, make sure to start the application by running `app.py` inside the `lung_nodule` Docker container. This will allow you to process images through the pipeline.
+### 1. **Upload Images to Docker Container**
 
-In the terminal, run:
+Before running the full pipeline, you need to upload images to the `lung_nodule` container. This can be done using `curl.exe`:
+
+```bash
+curl -X POST -F "file=@uploads/image.dcm" http://localhost:5000/upload
+```
+
+🗂️ The images to be uploaded should be stored in the `/uploads` folder.
+
+### 2. **Run `app.py` in Docker Lung Nodule**
+
+Run the `app.py` script inside the **Lung Nodule** Docker container to start the image processing pipeline.
 
 ```bash
 docker exec -it lung_nodule python app.py
 ```
 
-### Step 2: Upload Images to Docker
+### 3. **Execute `orthanc_client.py` to Upload Images to Orthanc**
 
-To upload images to Docker, use the following `curl.exe` command to send the images to the Docker container:
-
-```bash
-curl.exe -X POST -F "file=@/path/to/image.dcm" http://localhost:5000/upload
-```
-
-Replace `/path/to/image.dcm` with the actual path to the DICOM image you want to upload.
-
-### Step 3: Upload Images to Orthanc
-
-Next, execute `orthanc_client.py` inside the `lung_nodule` Docker container to upload the images to Orthanc:
+Run `orthanc_client.py` inside the **Lung Nodule** container to upload processed images to Orthanc:
 
 ```bash
 docker exec -it lung_nodule python orthanc_client.py
 ```
 
-This will ensure that the images are transferred to Orthanc for further processing.
+### 4. **Run the Full Pipeline**
 
-### Step 4: Run the Full Pipeline
-
-Finally, execute the pipeline in Docker to process the images:
+Once the images are uploaded to Orthanc and processed by MONAI, you can execute the full pipeline:
 
 ```bash
 docker exec -it lung_nodule python pipeline.py
 ```
 
-This will complete the full cycle of downloading, processing, and re-uploading the images.
-
-### Step 5: View Processed Images in Orthanc
-
-To visualize the processed images, access Orthanc at:
-
-```bash
-http://orthanc:8042/instances
-```
-
-You can view all the DICOM images that have been processed and uploaded to Orthanc.
+🗂️ The images downloaded from Orthanc will be saved in the `/downloads` folder.  
+🗂️ The images processed by MONAI will be saved in the `/infered` folder.
 
 ---
 
-## 🚀 Workflow Summary
+## 🔍 View Processed Images
 
-This pipeline allows you to:
+After executing the full pipeline, you can view the processed images in Orthanc by navigating to the following URL in your browser:
 
-- Download DICOM images from Orthanc
-- Modify and upload them to MONAI Deploy
-- Perform inference using a pretrained lung nodule detection model
-- Re-upload the processed images back to Orthanc
+[http://localhost:8042/instances](http://localhost:8042/instances)
 
 ---
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-
