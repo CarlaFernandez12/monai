@@ -4,4 +4,4 @@ pydicom
 flask
 monai
 monai-deploy-app-sdk
-highdicom
+highdicom 
