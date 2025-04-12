@@ -5,21 +5,21 @@ from orthanc.send_orthanc import SendToOrthancOperator
 INFERRED_FOLDER = "/app/data/inferred"  
 
 def run_pipeline():
-    print("=== CICLO COMPLETO INICIADO ===")
+    print("=== FULL CYCLE STARTED ===")
 
-    # Paso 1: Descargar DICOM desde Orthanc
+    # Step 1: Download DICOM from Orthanc
     downloader = DownloadFromOrthanc()
     downloader.run()
 
-    # Paso 2: Ejecutar MONAI para procesar la imagen
+    # Step 2: Run MONAI to process the image
     monai_app = MainApplication()
     monai_app.run()
 
-    # Paso 3: Subir imagen inferida de vuelta a Orthanc
+    # Step 3: Upload inference image back to Orthanc
     sender = SendToOrthancOperator(folder=INFERRED_FOLDER)
     sender.compute()
 
-    print("✅ CICLO COMPLETO FINALIZADO")
+    print("✅ FULL CYCLE COMPLETED")
 
 if __name__ == "__main__":
     run_pipeline()

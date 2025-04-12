@@ -24,22 +24,22 @@ class OrthancClient:
 
             instance_ids = get_all_instance_ids()
             if any(filename in id_ for id_ in instance_ids):
-                print(f"⚠ La imagen {filename} ya está en Orthanc.")
+                print(f"⚠ The image {filename} is already in Orthanc.")
                 return
 
             if upload_dicom_to_orthanc(modified_path):
-                print(f"✅ Subido: {filename}")
+                print(f"✅ Uploaded: {filename}")
             else:
-                print("❌ Error en la subida.")
+                print("❌ Error uploading.")
 
         except Exception as e:
-            print(f"❌ Error al subir {dicom_path}: {e}")
+            print(f"❌ Error uploading {dicom_path}: {e}")
 
     def download_first_dicom(self):
         try:
             instance_ids = get_all_instance_ids()
             if not instance_ids:
-                print("❌ No hay imágenes DICOM disponibles.")
+                print("❌ There are no DICOM images available.")
                 return
 
             instance_id = instance_ids[0]
@@ -47,12 +47,12 @@ class OrthancClient:
             full_path = os.path.join(DOWNLOAD_FOLDER, filename)
 
             if file_exists(full_path):
-                print(f"⚠ El archivo {filename} ya existe.")
+                print(f"⚠ File {filename} already exists.")
                 return
 
             content = download_instance_file(instance_id)
             if content:
                 save_bytes(content, full_path)
-                print(f"✅ Descargada: {full_path}")
+                print(f"✅ Downloaded: {full_path}")
         except Exception as e:
-            print(f"❌ Error inesperado al descargar:{e}")
+            print(f"❌ Unexpected error while downloading:{e}")

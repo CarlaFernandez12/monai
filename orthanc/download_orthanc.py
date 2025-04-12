@@ -5,7 +5,7 @@ class DownloadFromOrthanc:
         self.orthanc_client = OrthancClient()
 
     def run(self):
-        print("⬇ Ejecutando DownloadFromOrthanc...")
+        print("⬇ Running DownloadFromOrthanc...")
         self.orthanc_client.download_first_dicom()
 
 

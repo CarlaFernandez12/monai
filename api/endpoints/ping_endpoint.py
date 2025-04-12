@@ -1,4 +1,4 @@
 from flask import jsonify
 
 def ping():
-    return jsonify({'message': 'El servidor funciona correctamente'}),200
+    return jsonify({'message': 'The server is working properly'}),200

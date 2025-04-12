@@ -10,4 +10,4 @@ def download_file(filename):
     file_path = os.path.join(UPLOAD_FOLDER, filename)
     if os.path.exists(file_path):
         return send_file(file_path, as_attachment=True)
-    return jsonify({'error': 'Archivo no encontrado'}),404
+    return jsonify({'error': 'File not found'}),404

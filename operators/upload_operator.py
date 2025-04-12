@@ -15,10 +15,10 @@ def upload_to_monai(file_path: str) -> bool:
         response = requests.post(MONAI_URL, files=files)
 
     if response.status_code == 200:
-        print(f"✅ {os.path.basename(file_path)} subido con éxito a MONAI Deploy.")
+        print(f"✅ {os.path.basename(file_path)} successfully uploaded to MONAI Deploy.")
         return True
 
-    print(f"❌ Error al subir {os.path.basename(file_path)}: {response.status_code}, {response.text}")
+    print(f"❌ Error uploading {os.path.basename(file_path)}: {response.status_code}, {response.text}")
     return False
 
 
@@ -30,7 +30,7 @@ class UploadToMONAIOperator(Operator):
         dicom_files = list_files_with_suffix(DICOM_FOLDER, DOWNLOAD_SUFFIX)
 
         if not dicom_files:
-            print("❌ No hay archivos DICOM descargados con '_downloaded.dcm' en la carpeta.")
+            print("❌ There are no DICOM files downloaded with '_downloaded.dcm' in the folder.")
             return
 
         for filename in dicom_files:
@@ -44,11 +44,11 @@ class UploadToMONAIOperator(Operator):
 
 
                 if not os.path.exists(modified_path):
-                    print(f"❌ El archivo modificado no existe: {modified_path}")
+                    print(f"❌ The modified file does not exist: {modified_path}")
                     continue
 
                 upload_to_monai(modified_path)
                 remove_file(dicom_path)
 
             except Exception as e:
-                print(f"❌ Error al procesar {dicom_path}:{e}")
+                print(f"❌ Error processing {dicom_path}:{e}")

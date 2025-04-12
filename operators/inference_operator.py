@@ -15,14 +15,14 @@ class InferenceOperator(Operator):
         super().__init__(fragment)
 
     def compute(self, context: ExecutionContext):
-        print("🧠 Ejecutando inferencia...")
+        print("🧠 Running inference...")
 
         if not os.path.exists(INFERRED_FOLDER):
             os.makedirs(INFERRED_FOLDER)
 
         image_files = [f for f in os.listdir(DICOM_FOLDER) if f.endswith("_downloaded.dcm")]
         if not image_files:
-            print("❌ No hay imágenes para procesar.")
+            print("❌ There are no images to process.")
             return
 
         for img_file in image_files:
@@ -40,7 +40,7 @@ class InferenceOperator(Operator):
 
             with torch.no_grad():
                 output = model(image.unsqueeze(0))
-                print("✅ Inferencia completada.")
+                print("✅ Inference completed.")
 
                 output_image = output.squeeze().cpu().numpy()
 
@@ -55,6 +55,6 @@ class InferenceOperator(Operator):
                 dicom = modify_metadata(dicom)
 
                 result_dicom_path = save_modified_dicom(dicom, img_path, INFERRED_FOLDER)
-                print(f"✅ Resultado guardado como DICOM en: {result_dicom_path}")
+                print(f"✅ Result saved as DICOM in: {result_dicom_path}")
 
-            print(f"Archivos en la carpeta de inferencia: {os.listdir(INFERRED_FOLDER)}")
+            print(f"Files in the inference folder: {os.listdir(INFERRED_FOLDER)}")

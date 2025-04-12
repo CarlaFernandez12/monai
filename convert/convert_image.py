@@ -18,13 +18,13 @@ def main():
     ])
 
     if not image_files:
-        print("No se encontraron imágenes en formato .mhd.")
+        print("No .mhd images were found.")
         return
 
-    print(f"Total de imágenes: {len(image_files)}")
+    print(f"Total number of images: {len(image_files)}")
 
     for mhd_file in image_files:
-        print(f"Convirtiendo {mhd_file} a DICOM...")
+        print(f"Converting {mhd_file} to DICOM...")
         convert_mhd_to_dicom(mhd_file, OUTPUT_DIR)
 
 

@@ -9,16 +9,13 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class ImageProcessingApp(Application):
-    """
-    Aplicación MONAI Deploy para manejar el servidor Flask y procesamiento DICOM.
-    """
     def __init__(self):
         super().__init__()
         self.app = Flask(__name__)
         self.setup_endpoints()
 
     def compose(self):
-        logger.info("Método compose implementado correctamente.")
+        logger.info("Compose method implemented successfully.")
 
     def setup_endpoints(self):
         self.app.add_url_rule('/ping', 'ping', ping, methods=['GET'])
@@ -28,7 +25,7 @@ class ImageProcessingApp(Application):
         try:
             self.app.run(debug=True, host="0.0.0.0", port=5000)
         except Exception as e:
-            logger.error(f"Error al iniciar la aplicación Flask: {str(e)}")
+            logger.error(f"Error starting the Flask application.: {str(e)}")
             raise
 
 if __name__ == "__main__":

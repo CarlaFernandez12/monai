@@ -52,4 +52,4 @@ def convert_mhd_to_dicom(mhd_file, output_dir):
             
         pydicom.dcmwrite(output_path, dicom_file, write_like_original=False)
 
-    print(f"Conversión de {mhd_file} a DICOM completada. Archivos guardados en {output_dir}")
+    print(f"Conversion of {mhd_file} to DICOM completed. Files saving in {output_dir}")
