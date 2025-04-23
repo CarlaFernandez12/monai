@@ -1,0 +1,33 @@
+{
+    "Name": "Orthanc",
+    "DicomAet": "ORTHANC_MONAI",
+    "StorageDirectory": "/var/lib/orthanc/db",
+    "RemoteAccessAllowed": true,
+    "AuthenticationEnabled": false,
+    "DicomPort": 4242,
+    "HttpPort": 8042,
+    "RegisteredUsers": {},
+    "KeepAlive": true,
+    "OverwriteInstances": true,
+    "HttpDescribeErrors": true,
+    "DicomModalities": {
+        "CLIENT_AE": [ "CLIENT_AE", "lung_nodule", 4242 ],
+        "ORTHANC_MONAI": [ "ORTHANC_MONAI", "172.19.0.2", 4242 ]
+    },
+    "DicomPresentationContexts": [
+        {
+            "SOPClass": "1.2.840.10008.5.1.4.1.1.2",
+            "TransferSyntaxes": [
+                "1.2.840.10008.1.2.1",  
+                "1.2.840.10008.1.2.4.50" 
+            ]
+        },
+        {
+            "SOPClass": "1.2.840.10008.5.1.4.1.1.4", 
+            "TransferSyntaxes": [
+                "1.2.840.10008.1.2.1",  
+                "1.2.840.10008.1.2.4.50" 
+            ]
+        }
+    ]
+}

@@ -28,6 +28,7 @@ def convert_mhd_to_dicom(mhd_file, output_dir):
         dicom_file = Dataset()
         dicom_file.file_meta = file_meta
 
+        dicom_file.SOPClassUID = CTImageStorage
         dicom_file.PatientName = "LUNA16_Paciente"
         dicom_file.PatientID = "123456"
         dicom_file.StudyDate = datetime.datetime.now().strftime("%Y%m%d")
@@ -42,6 +43,7 @@ def convert_mhd_to_dicom(mhd_file, output_dir):
         dicom_file.BitsAllocated = 16
         dicom_file.BitsStored = 16
         dicom_file.HighBit = 15
+        dicom_file.StudyInstanceUID = generate_uid()
         dicom_file.PixelRepresentation = 1
         dicom_file.PixelData = slice_array.tobytes()
 
