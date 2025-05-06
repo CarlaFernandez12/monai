@@ -12,8 +12,8 @@
     "HttpDescribeErrors": true,
     
         "DicomModalities": {
-          "MYCLIENT": [ "MYCLIENT", "172.19.0.3", 4242 ],  // Agregar esta línea
-          "MYLISTENER": [ "MYLISTENER", "127.0.0.1", 4242 ]
+          "MYCLIENT": [ "MYCLIENT", "172.19.0.3", 4242 ],  
+          "MYLISTENER": [ "MYLISTENER", "lung_nodule2", 11112 ]
         },
 
         "DicomAETs": {
