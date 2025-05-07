@@ -13,15 +13,13 @@ def modify_metadata(ds: pydicom.Dataset) -> pydicom.Dataset:
     ds.SeriesInstanceUID = pydicom.uid.generate_uid()
     return ds
 
-def save_modified_dicom(ds: pydicom.Dataset, original_path: str, output_folder: str) -> str:
-    filename = os.path.basename(original_path)
-    
-    if not filename.startswith("mod_"):
-        filename = f"mod_{filename}"
-    
-    output_path = os.path.join(output_folder, filename)
-    
-    ds.save_as(output_path)
-    
-    return output_path
+def save_modified_dicom(dicom, original_path, output_dir):
+    base_name = os.path.basename(original_path)
+    save_path = os.path.join(output_dir, f"mod_{base_name}")
+
+    dicom.ImageComments = f"Processed and saved at: {save_path}"
+
+    dicom.save_as(save_path, write_like_original=False)
+    return save_path
+
  

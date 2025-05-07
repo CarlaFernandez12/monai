@@ -1,89 +1,63 @@
 import os
 import torch
-import pydicom
-from monai.deploy.core import Operator, ExecutionContext, Fragment
 from monai.transforms import LoadImage, EnsureChannelFirst, Resize, ScaleIntensity
 from monai.networks.nets import UNet
 from utils.dicom_utils import read_dicom, modify_metadata, save_modified_dicom
-from pynetdicom import AE
-from pynetdicom.sop_class import CTImageStorage
 
-DICOM_FOLDER = "/app/data/downloads"
+MONAI_UPLOADS_DIR = "/uploads/"
+MONAI_INFERRED_DIR = "/inferred/"
 MODEL_PATH = "/app/model.pt"
-INFERRED_FOLDER = "/app/data/inferred"
 
-def send_to_orthanc_dicom(dicom_path, orthanc_host="orthanc", orthanc_port=4242, orthanc_aet="ORTHANC"):
-    ae = AE(ae_title="MONAI")
-    ae.add_requested_context(CTImageStorage)
+class InferenceOperator:
+    def __init__(self): 
+        self.model = self._load_model()
+        os.makedirs(MONAI_INFERRED_DIR, exist_ok=True)
 
-    assoc = ae.associate(orthanc_host, orthanc_port, ae_title=orthanc_aet)
+    def _load_model(self):
+        model = UNet(
+            spatial_dims=3,
+            in_channels=1,
+            out_channels=1,
+            channels=(16, 32, 64, 128),
+            strides=(2, 2, 2),
+            num_res_units=2
+        )
+        model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"), strict=False)
+        model.eval()
+        return model
 
-    if assoc.is_established:
-        ds = pydicom.dcmread(dicom_path)
-        status = assoc.send_c_store(ds)
-        assoc.release()
-        if status:
-            print(f"✅ Sent {dicom_path} to Orthanc via DICOM. Status: 0x{status.Status:04X}")
-        else:
-            print(f"❌ Failed to send {dicom_path}. No status returned.")
-    else:
-        print("❌ Association with Orthanc failed.")
-
-
-class InferenceOperator(Operator):
-    def __init__(self, fragment: Fragment): 
-        super().__init__(fragment)
-
-    def compute(self, context: ExecutionContext):
-        print("🧠 Running inference...")
-
-        if not os.path.exists(INFERRED_FOLDER):
-            os.makedirs(INFERRED_FOLDER)
-
-        image_files = [f for f in os.listdir(DICOM_FOLDER) if f.endswith("_downloaded.dcm")]
+    def run(self):
+        image_files = [f for f in os.listdir(MONAI_UPLOADS_DIR) if f.endswith('.dcm')]
         if not image_files:
-            print("❌ There are no images to process.")
-            return
+            print("❌ No DICOM images to process.")
+            return []
+
+        output_files = []
 
         for img_file in image_files:
-            img_path = os.path.join(DICOM_FOLDER, img_file)
+            img_path = os.path.join(MONAI_UPLOADS_DIR, img_file)
+            print(f"📥 Processing {img_path}...")
 
             image = LoadImage()(img_path)
             image = EnsureChannelFirst()(image)
             image = ScaleIntensity()(image)
             image = Resize((128, 128, 128))(image)
 
-            model = UNet(
-                spatial_dims=3,
-                in_channels=1,
-                out_channels=1,
-                channels=(16, 32, 64, 128),
-                strides=(2, 2, 2),
-                num_res_units=2
-            )
-            model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"), strict=False)
-            model.eval()
-
             with torch.no_grad():
-                output = model(image.unsqueeze(0))
-                print("✅ Inference completed.")
-
+                output = self.model(image.unsqueeze(0))
                 output_image = output.squeeze().cpu().numpy()
 
-                dicom = read_dicom(img_path)
-                dicom.PixelData = output_image.tobytes()
+            dicom = read_dicom(img_path)
+            dicom.PixelData = output_image.tobytes()
+            dicom = modify_metadata(dicom)
 
-                if len(output_image.shape) == 3:
-                    dicom.Rows, dicom.Columns, _ = output_image.shape
-                else:
-                    dicom.Rows, dicom.Columns = output_image.shape
+            if len(output_image.shape) == 3:
+                dicom.Rows, dicom.Columns, _ = output_image.shape
+            else:
+                dicom.Rows, dicom.Columns = output_image.shape
 
-                dicom = modify_metadata(dicom)
-                result_dicom_path = save_modified_dicom(dicom, img_path, INFERRED_FOLDER)
+            result_path = save_modified_dicom(dicom, img_path, MONAI_INFERRED_DIR)
+            print(f"✅ Saved processed DICOM to: {result_path}")
+            output_files.append(result_path)
 
-                print(f"✅ Result saved as DICOM in: {result_dicom_path}")
-
-                # Subir a Orthanc usando protocolo DICOM
-                send_to_orthanc_dicom(result_dicom_path)
-
-        print(f"📂 Files in the inference folder: {os.listdir(INFERRED_FOLDER)}")
+        return output_files
