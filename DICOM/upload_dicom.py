@@ -21,7 +21,7 @@ ae.add_requested_context(SecondaryCaptureImageStorage)
 assoc = ae.associate(ORTHANC_HOST, ORTHANC_PORT, ae_title=ORTHANC_AET)
 
 if assoc.is_established:
-    print("✅ Asociación establecida con Orthanc")
+    print("✅ Association established with Orthanc")
 
     for root, _, files in os.walk(DICOM_DIR):
         for filename in files:
@@ -29,20 +29,16 @@ if assoc.is_established:
                 filepath = os.path.join(root, filename)
                 try:
                     ds = pydicom.dcmread(filepath)
-                    if 'StudyInstanceUID' not in ds:
-                        # Generar uno nuevo
-                        ds.StudyInstanceUID = "KJABSDKJABSDK"
-                        print(f"Se ha añadido StudyInstanceUID: {ds.StudyInstanceUID}")
                     status = assoc.send_c_store(ds)
                     print(ds)
                     if status and status.Status == 0x0000:
-                        print(f"✅ Subido: {filename}")
+                        print(f"✅ Uploaded: {filename}")
                     else:
-                        print(f"❌ Fallo al subir {filename}: {status}")
+                        print(f"❌ Failed to upload {filename}: {status}")
                 except Exception as e:
-                    print(f"⚠️ Error con {filename}: {e}")
+                    print(f"⚠️ Error with {filename}: {e}")
 
     assoc.release()
-    print("🔁 Asociación cerrada")
+    print("🔁 Association closed")
 else:
-    print("❌ No se pudo establecer conexión con Orthanc")
+    print("❌ Could not establish connection with Orthanc")

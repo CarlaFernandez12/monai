@@ -22,11 +22,11 @@ ds = Dataset()
 ds.QueryRetrieveLevel = 'STUDY'
 ds.StudyInstanceUID = STUDY_INSTANCE_UID
 
-# Asociación
+
 assoc = ae.associate(ORTHANC_IP, ORTHANC_PORT, ae_title=ORTHANC_AET)
 
 if assoc.is_established:
-    print("✅ Asociación establecida con Orthanc para C-MOVE")
+    print("✅ Association established with Orthanc for C-MOVE")
 
 
     responses = assoc.send_c_move(ds, MOVE_DEST_AET, StudyRootQueryRetrieveInformationModelMove)
@@ -36,12 +36,11 @@ if assoc.is_established:
             try:
                 print(f"🟢 C-MOVE Status: 0x{status.Status:04x}")
             except AttributeError:
-                print("⚠️ Estado de respuesta sin atributo 'Status'")
+                print("⚠️ Response status without 'Status' attribute")
         else:
-            print("🔴 Error: No se recibió respuesta del servidor")
+            print("🔴 Error: No response received from the server")
 
-    # Cerrar asociación
     assoc.release()
-    print("🔁 Asociación con Orthanc cerrada")
+    print("🔁 Association with Orthanc closed")
 else:
-    print("❌ No se pudo establecer asociación con Orthanc")
+    print("❌ Failed to establish association with Orthanc")

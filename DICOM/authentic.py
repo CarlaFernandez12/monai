@@ -9,27 +9,26 @@ ORTHANC_IP = "orthanc"
 ORTHANC_PORT = 4242
 
 def authenticate_with_orthanc():
-    """Establece una asociación DICOM con Orthanc y realiza un C-ECHO."""
     ae = AE(ae_title=CLIENT_AE_TITLE)
     ae.add_requested_context(Verification)
 
-    print(f"🔄 Intentando establecer asociación con {ORTHANC_IP}:{ORTHANC_PORT} como AE Title '{ORTHANC_AE_TITLE}'...")
+    print(f"🔄 Attempting to establish association with {ORTHANC_IP}:{ORTHANC_PORT} as AE Title '{ORTHANC_AE_TITLE}'...")
 
     assoc = ae.associate(addr=ORTHANC_IP, port=ORTHANC_PORT, ae_title=ORTHANC_AE_TITLE)
 
     if assoc.is_established:
-        print("✅ Asociación DICOM establecida correctamente.")
+        print("✅ DICOM association established successfully.")
 
         status = assoc.send_c_echo()
 
         if status and status.Status == 0x0000:
-            print("✅ C-ECHO exitoso: el servidor Orthanc respondió correctamente.")
+            print("✅ C-ECHO successful: Orthanc server responded correctly.")
         else:
-            print(f"⚠️ C-ECHO fallido. Status: {status}")
+            print(f"⚠️ C-ECHO failed. Status: {status}")
 
         assoc.release()
     else:
-        print("❌ No se pudo establecer la asociación DICOM con Orthanc.")
+        print("❌ DICOM association with Orthanc could not be established.")
 
 if __name__ == "__main__":
     authenticate_with_orthanc()
