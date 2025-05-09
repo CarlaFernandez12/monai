@@ -2,17 +2,11 @@ import os
 import pydicom
 from pynetdicom import AE
 from pynetdicom.sop_class import CTImageStorage, MRImageStorage, SecondaryCaptureImageStorage
+from config import ORTHANC_HOST, ORTHANC_PORT, ORTHANC_AET, CLIENT_AE_TITLE, DICOM_DIR
 import logging
 logger = logging.getLogger()
 
-ORTHANC_HOST = 'orthanc'     
-ORTHANC_PORT = 4242
-ORTHANC_AET = 'ORTHANC'
-CLIENT_AET = 'CLIENT_AE'
-DICOM_DIR = '/app/data/uploads' \
-'' 
-
-ae = AE(ae_title=CLIENT_AET)
+ae = AE(ae_title=CLIENT_AE_TITLE)
 
 ae.add_requested_context(CTImageStorage)
 ae.add_requested_context(MRImageStorage)
@@ -29,6 +23,13 @@ if assoc.is_established:
                 filepath = os.path.join(root, filename)
                 try:
                     ds = pydicom.dcmread(filepath)
+
+                    patient_id = getattr(ds, "PatientID", None)
+                    if not patient_id:
+                        logger.warning(f"⚠️ DICOM file {filename} has no PatientID. Uploading anyway.")
+                    else:
+                        logger.info(f"📌 Uploading file for PatientID: {patient_id}")
+
                     status = assoc.send_c_store(ds)
                     print(ds)
                     if status and status.Status == 0x0000:
