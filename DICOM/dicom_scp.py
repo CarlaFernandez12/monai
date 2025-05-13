@@ -25,5 +25,5 @@ ae.ae_title = b"monai_s2"
 
 handlers = [(evt.EVT_C_STORE, handle_store)]
 
-print("[*] Listening on port 11113 as C-STORE SCP server...")
+print("[*] Listening on LISTENING_PORT as C-STORE SCP server...")
 ae.start_server(("", LISTENING_PORT), evt_handlers=handlers, block=True)

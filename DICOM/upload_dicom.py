@@ -49,11 +49,14 @@ def upload_all_dicoms(ae):
 
     print("✅ Association established with Orthanc")
 
-    for root, _, files in os.walk(DICOM_DIR):
-        dicom_files = [f for f in files if f.lower().endswith('.dcm')]
-        for filename in dicom_files:
-            filepath = os.path.join(root, filename)
-            upload_dicom_file(filepath, assoc)
+    dicom_files = [
+        os.path.join(root, f)
+        for root, _, files in os.walk(DICOM_DIR)
+        for f in files if f.lower().endswith('.dcm')
+    ]
+
+    for filepath in dicom_files:
+        upload_dicom_file(filepath, assoc)
 
     assoc.release()
     print("🔁 Association closed")
