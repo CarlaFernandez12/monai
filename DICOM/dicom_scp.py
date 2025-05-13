@@ -1,6 +1,7 @@
 from pynetdicom import AE, evt, AllStoragePresentationContexts
 from pydicom import dcmread
 import os
+from config import LISTENING_PORT
 
 SAVE_DIR = "/uploads/"
 
@@ -25,4 +26,4 @@ ae.ae_title = b"monai_s2"
 handlers = [(evt.EVT_C_STORE, handle_store)]
 
 print("[*] Listening on port 11113 as C-STORE SCP server...")
-ae.start_server(("", 11113), evt_handlers=handlers, block=True)
+ae.start_server(("", LISTENING_PORT), evt_handlers=handlers, block=True)
